@@ -53,4 +53,21 @@ class MemberJpaRepositoryTest {
         assertThat(members.size()).isEqualTo(3);
         assertThat(totalCount).isEqualTo(5);
     }
+
+    @DisplayName("Bulk Update > 나이가 20 이상인 회원의 나이를 + 1 Bulk Update")
+    @Test
+    void bulkUpdate() {
+        // given
+        memberJpaRepository.save(new Member("member1", 10));
+        memberJpaRepository.save(new Member("member2", 19));
+        memberJpaRepository.save(new Member("member3", 20)); // 21
+        memberJpaRepository.save(new Member("member4", 21)); // 22
+        memberJpaRepository.save(new Member("member5", 40)); // 41
+
+        // when
+        int result = memberJpaRepository.bulkAgePlus(20);
+
+        // then
+        assertThat(result).isEqualTo(3);
+    }
 }

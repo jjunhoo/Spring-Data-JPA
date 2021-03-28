@@ -14,6 +14,8 @@ import study.datajpa.dto.MemberDto;
 import study.datajpa.entity.Member;
 import study.datajpa.entity.Team;
 
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -26,6 +28,8 @@ class MemberRepositoryTest {
 
     @Autowired MemberRepository memberRepository;
     @Autowired TeamRepository teamRepository;
+    @PersistenceContext
+    EntityManager em;
 
     @DisplayName("Method 이름으로 쿼리 생성 > save / findById 테스트")
     @Test
@@ -170,5 +174,31 @@ class MemberRepositoryTest {
         assertThat(page.getTotalPages()).isEqualTo(2);    // 총 페이지 개수
         assertThat(page.isFirst()).isTrue();              // 현재 페이지가 첫번째 페이지인지 ?
         assertThat(page.hasNext()).isTrue();              // 다음 페이지가 존재하는지 ?
+    }
+
+    @DisplayName("Bulk Update > 나이가 20 이상인 회원의 나이를 + 1 Bulk Update")
+    @Test
+    void bulkUpdate() {
+        // given
+        memberRepository.save(new Member("member1", 10));
+        memberRepository.save(new Member("member2", 19));
+        memberRepository.save(new Member("member3", 20)); // 21
+        memberRepository.save(new Member("member4", 21)); // 22
+        memberRepository.save(new Member("member5", 40)); // 41
+
+        // when
+        int result = memberRepository.bulkAgePlus(20);
+
+        // * 주의할 점 : 현재 시점에 member5 를 조회할 경우, DB 에는 age - 41 로 반영되어 있겠지만,
+        // 영속성 컨텍스트 안에는 member5가 age - 40 으로 남아있음
+        // - 따라서, Bulk 연산 이후에는 영속성 컨텍스트를 다 날려줘야함 (중요)
+        // - 아래와 같이 em.clear() 를 호출하거나 @Modifying 어노테이션의 clearAutomatically 옵션을 true 로 설정
+        // em.clear();
+
+        List<Member> member = memberRepository.findByUsername("member5");
+        System.out.println("member = " + member.get(0));
+
+        // then
+        assertThat(result).isEqualTo(3);
     }
 }
