@@ -12,6 +12,7 @@ import study.datajpa.entity.Team;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -107,5 +108,24 @@ class MemberRepositoryTest {
         for (Member member : memberList) {
             System.out.println("member = " + member);
         }
+    }
+
+    @DisplayName("@Query 테스트 > 반환 타입")
+    @Test
+    void returnType() {
+        Member m1 = new Member("AAA", 10);
+        Member m2 = new Member("BBB", 20);
+        memberRepository.save(m1);
+        memberRepository.save(m2);
+
+        // * List 는 빈값인 경우 '0' 으로 반환 (null 반환 아님 !) > if (result != null) 코드 작성 X
+        List<Member> member = memberRepository.findListByUsername("ABCD");
+        System.out.println("member = " + member);
+        // * 빈값인 경우, 'null' 반환
+        Member findMember = memberRepository.findMemberByUsername("ABCD");
+        System.out.println("findMember = " + findMember);
+        // * 빈값인 경우, Optional.empty
+        Optional<Member> optionalMember = memberRepository.findOptionalByUsername("ABCD");
+        System.out.println("optionalMember = " + optionalMember);
     }
 }
