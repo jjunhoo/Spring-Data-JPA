@@ -201,4 +201,32 @@ class MemberRepositoryTest {
         // then
         assertThat(result).isEqualTo(3);
     }
+
+    @Test
+    void findMemberLazy() {
+        // given
+        Team teamA = new Team("teamA");
+        Team teamB = new Team("teamB");
+        teamRepository.save(teamA);
+        teamRepository.save(teamB);
+
+        Member member1 = new Member("member1", 10, teamA);
+        Member member2 = new Member("member2", 10, teamB);
+        memberRepository.save(member1);
+        memberRepository.save(member2);
+
+        em.flush();
+        em.clear();
+
+        // when - N + 1
+        // @EntityGraph 를 통해 Override 한 findAll 은 fetch join 으로 조회하기 때문에 쿼리가 1번만 실행
+        List<Member> members = memberRepository.findAll();
+
+        for (Member member : members) {
+            System.out.println("member = " + member.getUsername());
+            System.out.println("member teamclass = " + member.getClass());
+            System.out.println("member.team = " + member.getTeam().getName());
+        }
+
+    }
 }
