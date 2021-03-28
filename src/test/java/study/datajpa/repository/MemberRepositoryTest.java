@@ -10,6 +10,7 @@ import study.datajpa.dto.MemberDto;
 import study.datajpa.entity.Member;
 import study.datajpa.entity.Team;
 
+import java.util.Arrays;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -23,7 +24,7 @@ class MemberRepositoryTest {
 
     @DisplayName("Method 이름으로 쿼리 생성 > save / findById 테스트")
     @Test
-    public void testMember() {
+    void testMember() {
         Member member = new Member("testMember");
         Member saveMember = memberRepository.save(member);
 
@@ -36,7 +37,7 @@ class MemberRepositoryTest {
 
     @DisplayName("@NamedQuery 테스트")
     @Test
-    public void findByUsername() {
+    void findByUsername() {
         Member m1 = new Member("AAA", 10);
         Member m2 = new Member("BBB", 20);
 
@@ -50,7 +51,7 @@ class MemberRepositoryTest {
 
     @DisplayName("@Query 테스트")
     @Test
-    public void findUser() {
+    void findUser() {
         Member m1 = new Member("AAA", 10);
         Member m2 = new Member("BBB", 20);
 
@@ -63,7 +64,7 @@ class MemberRepositoryTest {
 
     @DisplayName("@Query 테스트")
     @Test
-    public void findUsernameList() {
+    void findUsernameList() {
         Member m1 = new Member("AAA", 10);
         Member m2 = new Member("BBB", 20);
 
@@ -78,7 +79,7 @@ class MemberRepositoryTest {
 
     @DisplayName("@Query 테스트 > DTO 조회")
     @Test
-    public void findMemberDto() {
+    void findMemberDto() {
         Team team = new Team("teamA");
         teamRepository.save(team);
 
@@ -91,6 +92,20 @@ class MemberRepositoryTest {
         for (MemberDto memberDto : usernameList) {
             System.out.println("memberDto = " + memberDto);
         }
+    }
 
+    @DisplayName("@Query 테스트 > IN 절 조회")
+    @Test
+    void findByNames() {
+        Member m1 = new Member("AAA", 10);
+        Member m2 = new Member("BBB", 20);
+        memberRepository.save(m1);
+        memberRepository.save(m2);
+
+        List<Member> memberList = memberRepository.findByNames(Arrays.asList("AAA", "BBB"));
+
+        for (Member member : memberList) {
+            System.out.println("member = " + member);
+        }
     }
 }

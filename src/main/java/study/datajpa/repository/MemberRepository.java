@@ -18,7 +18,7 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
     List<Member> findByUsername(@Param("username") String username);
 
     // @Query 사용법
-    @Query("select m from Member m where m.username = :username and m.age = :age")
+    @Query("select m from Member m where m.username = :username and m.age = :age") // Parameter Binding -> :username 에 @Param("username") 으로 받은 파라미터가 바인딩
     List<Member> findUser(@Param("username") String username, @Param("age") int age);
 
     // @Query 사용법
@@ -28,4 +28,8 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
     // @Query 사용법 (DTO 로 반환하는 방법)
     @Query("select new study.datajpa.dto.MemberDto(m.id, m.username, t.name) from Member m join m.team t")
     List<MemberDto> findMemberDto();
+
+    // @Query 사용법 (IN 절 사용법)
+    @Query("select m from Member m where m.username in :names")
+    List<Member> findByNames(@Param("names") List<String> names);
 }
