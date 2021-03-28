@@ -1,5 +1,7 @@
 package study.datajpa.repository;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -38,4 +40,9 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
     List<Member> findListByUsername(String username); // 반환 타입 : 컬렉션
     Member findMemberByUsername(String username); // 반환 타입 : 단건
     Optional<Member> findOptionalByUsername(String username); // 반환 타입 : 단건 optional
+
+    // Paging - count 쿼리 분리 (count 쿼리 최적화를 위한 분리 > count 쿼리 시 불필요 join 제거)
+    @Query(value = "select m from Member m left join m.team t",
+           countQuery = "select count(m.username) from Member m")
+    Page<Member> findByAge(int age, Pageable pageable);
 }
