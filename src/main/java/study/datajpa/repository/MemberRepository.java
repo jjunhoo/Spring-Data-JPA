@@ -2,14 +2,13 @@ package study.datajpa.repository;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.jpa.repository.EntityGraph;
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Modifying;
-import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.jpa.repository.*;
 import org.springframework.data.repository.query.Param;
 import study.datajpa.dto.MemberDto;
 import study.datajpa.entity.Member;
 
+import javax.persistence.LockModeType;
+import javax.persistence.QueryHint;
 import java.util.List;
 import java.util.Optional;
 
@@ -76,4 +75,12 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
     // @EntityGraph 사용법 3) - Query Method + EntityGraph
     @EntityGraph(attributePaths = {"team"})
     List<Member> findEntityGraphByUsername(@Param("username") String username);
+
+    // 단순 조회용으로만 관리하기 위한 목적이기 때문에 스냅샷을 생성하지 않음 (Dirty Checking 시 스냅샷이 없기 때문에 감지 안 됨)
+    @QueryHints(value = @QueryHint(name = "org.hibernate.readOnly", value = "true"))
+    Member findReadOnlyByUsername(String username);
+
+    // JPA - Lock 사용법 (for update)
+    @Lock(LockModeType.PESSIMISTIC_WRITE)
+    List<Member> findLockByUsername(String username);
 }
