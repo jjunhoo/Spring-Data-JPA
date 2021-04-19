@@ -202,6 +202,7 @@ class MemberRepositoryTest {
         assertThat(result).isEqualTo(3);
     }
 
+    @DisplayName("@EntityGraph 사용을 통한 fetch join")
     @Test
     void findMemberLazy() {
         // given
@@ -227,6 +228,35 @@ class MemberRepositoryTest {
             System.out.println("member teamclass = " + member.getClass());
             System.out.println("member.team = " + member.getTeam().getName());
         }
+    }
 
+    @DisplayName("@QueryHint 사용법 - readOnly 를 사용한 스냅샷 미생성 및 Dirty Checking 비감지")
+    @Test
+    void queryHint() {
+        // given
+        Member member1 = memberRepository.save(new Member("member1", 10));
+        em.flush();
+        em.clear();
+
+        // when
+        Member findMember = memberRepository.findReadOnlyByUsername("member1");
+        findMember.setUsername("member2");
+
+        // 위 라인에서 @QueryHints (readOnly) 가 없을 경우, member2 로 set 한 데이터가 flush 에 의하여 update 됨
+        // @QueryHints (readOnly) 가 있는 경우, 스냅샷을 생성하지 않고 dirty checking (변경 관리 감지) 을 하지 않음
+        em.flush();
+    }
+
+    @DisplayName("JPA - LOCK 사용법")
+    @Test
+    void lock() {
+        // given
+        Member member1 = new Member("member1", 10);
+        memberRepository.save(member1);
+        em.flush();
+        em.clear();
+
+        // when
+        List<Member> result = memberRepository.findLockByUsername("member1"); // for update
     }
 }
