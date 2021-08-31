@@ -1,6 +1,5 @@
 package study.datajpa.controller;
 
-public enum  SellerType {
-    GROUP,
+public enum SellerType {
     PARTNER
 }

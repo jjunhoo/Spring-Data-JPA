@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class HelloController {
 
     @GetMapping("/hello")
-    @WPermission(ApiServiceType.BROADCAST)
+    @CustomPermission(ApiServiceType.PRODUCT) // 1. @CustomPermission - Custom Annotation 적용 (Enum - Service Type)
     public String hello(@RequestHeader(value = "apiKey") String apiKey) {
         System.out.println("[apikey] : " + apiKey);
         return "hello";
