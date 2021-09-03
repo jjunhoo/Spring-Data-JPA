@@ -23,16 +23,12 @@ public class CustomPermissionProcessor {
     // - @CustomPermission : 어노테이션이 적용된 Controller 레이어 포인트컷 지정
     // - within : Class 경로
     @Pointcut("within(@study.datajpa.controller.CustomPermission *)")
-    public void customPermissionValidate() {
-        System.out.println("[customPermissionValidate] Pointcut init ");
-    }
+    public void customPermissionValidate() { }
 
     // 2. Around - @CustomPermission Annotation > ApiServiceType 확인
     // - @CustomPermission 어노테이션 또는 customPermissionValidate() 메소드에 적용
     @Around("@annotation(study.datajpa.controller.CustomPermission) || customPermissionValidate()")
     public Object validate(ProceedingJoinPoint pjp) throws Throwable {
-        System.out.println("[validate] Around init ");
-
         ApiServiceType[] permissions = getPermissions(pjp); // 해당 어노테이션 Value 값 (Service Type) 추출
         customRequestHolder.validate(permissions); // API 서비스 권한 validate
 
@@ -41,16 +37,9 @@ public class CustomPermissionProcessor {
 
     // 해당 Controller 레이어에 적용한 @CustomPermission 어노테이션의 값 추출 (서비스 타입 값)
     private ApiServiceType[] getPermissions(ProceedingJoinPoint pjp) {
-        System.out.println("[getPermissions] init ");
-
         MethodSignature signature = (MethodSignature) pjp.getSignature(); // Reflection
-        System.out.println("[signature] : " + signature.toString());
-
         Method method = signature.getMethod();
-        System.out.println("[method] : " + method.toString());
-
         CustomPermission customPermission = method.getAnnotation(CustomPermission.class); // Annotation 정보 취득
-        System.out.println("[CustomPermission] : " + customPermission.toString());
 
         if (isNull(customPermission)) {
             Class<?> declaringClass = method.getDeclaringClass();
